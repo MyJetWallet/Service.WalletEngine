@@ -12,7 +12,7 @@ namespace WalletEngine.Messages
             message.Source = ApplicationEnvironment.HostName;
 
             var activity = Activity.Current;
-            message.ActivityId = activity?.Id;
+            message.ActivityId = activity?.Id ?? "";
 
 
             if (message is CashInOutRequestMessage) message.MessageType = MessageType.CashInOutRequest;

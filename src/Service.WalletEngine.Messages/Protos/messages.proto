@@ -1,0 +1,126 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "WalletEngine.Messages";
+
+package walletEngine;
+
+import "google/protobuf/timestamp.proto";
+
+// The request message containing the user's name.
+message HelloRequest {
+	
+	string name = 1; // user name
+}
+
+
+enum MessageType {
+	unknown = 0;
+
+	cashInOutRequest = 10; //
+	cashInOutConformation = 11; // change balance on the wallet
+
+	reserveForSwap = 20; // reserve balance to execute swap operation
+	unreserveForSwap = 21; // unreserve balance
+	changeReserveForSwap = 22; // event with change reserve for swap
+    
+	swapRequest = 30; // request to swap assets between wallets
+	swapConformation = 31; // message with swap result. Can be success or failed
+
+	walletSettings = 40; // request to change setting on the wallet
+	changeWalletSettings = 41; // event with change swap settings
+	walletInfo = 42; // set wallet info: broker, client, brand
+
+
+
+}
+
+enum ResultCode {
+	Ok = 0;
+}
+
+message WalletIdentity {
+	string walletId = 1; // wallet id of the wallet
+
+	string brokerId = 2; // optional, broker id of the wallet. Can be empty in case if do not send walletInfo.
+	string clientId = 3; // optional, clitnt id of the wallet. Can be empty in case if do not send walletInfo.
+	string brandId = 4;  // optional, brand of the client. Can be empty in case if do not send walletInfo.
+}
+
+message OnlyMessageTypeMessage {
+	MessageType messageType = 1; // type of the message
+}
+
+// Message provide only message header, base on this data subscriber can choose original type to parce message
+message BaseMessage {
+	MessageType messageType = 1; // type of the message
+	string operationId = 2;  // unique operation ID
+	google.protobuf.Timestamp timestamp = 3; // timestamp of the event
+	uint64 sequenceId = 4; // sequinse of the event. Actual only for outgoing messages
+	string context = 5; // context ot the process. Value will be copied from input message to output.
+	string source = 6; // sorce of the event
+	string activityId = 7; // ID of context activity 
+}
+
+message BaseOutgoingMessage {
+	MessageType messageType = 1; // type of the message
+	string operationId = 2;  // unique operation ID
+	google.protobuf.Timestamp timestamp = 3; // timestamp of the event
+	uint64 sequenceId = 4; // sequinse of the event. Actual only for outgoing messages
+	string context = 5; // context ot the process. Value will be copied from input message to output.
+	string source = 6; // sorce of the event
+	
+	ResultCode Result = 10; // result of operation
+	repeated WalletBalance balances = 11; // current balances of affected wallets
+
+
+}
+
+
+// inof about fee payments
+message FeeInfo {
+	string FeeAssetId = 1; // asset Id of fee payment
+	string FeeAmount = 2; // value of fee payment. Should be greate zero.
+}
+
+message WalletBalance {
+	WalletIdentity walletId = 1;
+	string asset = 2;
+	string balance = 3;
+	string reserve = 4;
+}
+
+
+// request to change balance for the wallet
+message CashInOutRequestMessage {
+	MessageType messageType = 1; // type of the message
+	string operationId = 2;  // unique operation ID
+	google.protobuf.Timestamp timestamp = 3; // timestamp of the event
+	uint64 sequenceId = 4; // sequinse of the event. Actual only for outgoing messages
+	string context = 5; // context ot the process. Value will be copied from input message to output.
+	string source = 6; // sorce of the event
+	string activityId = 7; // ID of context activity 
+
+	string walletId = 100; // wallet id
+	string assetId = 101; // changed asset
+	string amount = 102; // amount of the change. Do not include fee amount
+	FeeInfo fee = 103; // fee payment.string Can be null.
+}
+
+// request to change balance for the wallet
+message CashInOutConformationMessage {
+	MessageType messageType = 1; // type of the message
+	string operationId = 2;  // unique operation ID
+	google.protobuf.Timestamp timestamp = 3; // timestamp of the event
+	uint64 sequenceId = 4; // sequinse of the event. Actual only for outgoing messages
+	string context = 5; // context ot the process. Value will be copied from input message to output.
+	string source = 6; // sorce of the event
+	string activityId = 7; // ID of context activity 
+	
+	ResultCode Result = 10; // result of operation
+	repeated WalletBalance balances = 11; // current balances of affected wallets
+
+	WalletIdentity walletId = 100; // wallet id
+	string assetId = 101; // changed asset
+	string amount = 102; // amount of the change. Do not include fee amount
+	FeeInfo fee = 103; // fee payment.string Can be null.
+}

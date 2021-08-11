@@ -14,7 +14,7 @@ namespace Service.WalletEngine.Tests
         {
         }
 
-        [Test]
+        //[Test]
         public void Test1()
         {
             var message = new CashInOutRequestMessage()

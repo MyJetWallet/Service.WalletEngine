@@ -17,7 +17,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="MyJetWallet.Sdk.Service" Version="1.6.10" />
-    <PackageReference Include="MyJetWallet.Sdk.ServiceBus" Version="1.0.4" />
+    <PackageReference Include="MyJetWallet.Sdk.ServiceBus" Version="1.2.2" />
   </ItemGroup>
 
   <ItemGroup>

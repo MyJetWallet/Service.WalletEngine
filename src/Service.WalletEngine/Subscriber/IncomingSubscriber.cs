@@ -8,7 +8,7 @@ using WalletEngine.Messages.Tools;
 
 namespace Service.WalletEngine.Subscriber
 {
-    public class IncomingSubscriber: WalletTopicSubscriberSinge
+    public class IncomingSubscriber: WalletTopicSubscriberSingle
     {
         private readonly IWalletTopicPublisher _publisher;
 
@@ -19,7 +19,7 @@ namespace Service.WalletEngine.Subscriber
             _publisher = publisher;
         }
 
-        protected override ValueTask HandleCashInOutConformation(CashInOutConformationMessage message)
+        protected override ValueTask HandleCashInOutConfirmation(CashInOutConformationMessage message)
         {
             return ValueTask.CompletedTask;
         }
@@ -28,8 +28,7 @@ namespace Service.WalletEngine.Subscriber
         {
             Console.WriteLine(JsonConvert.SerializeObject(message, Formatting.Indented));
 
-
-            var wallet = new WalletIdentity()
+            var wallet = new WalletIdentity
             {
                 WalletId = message.WalletId
             };
@@ -38,7 +37,7 @@ namespace Service.WalletEngine.Subscriber
             {
                 Balances =
                 {
-                    new WalletBalance()
+                    new WalletBalance
                     {
                         Asset = "BTC",
                         Balance = "10",

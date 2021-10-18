@@ -8,11 +8,11 @@ using MyServiceBus.TcpClient;
 
 namespace WalletEngine.Messages.Tools
 {
-    public abstract class WalletTopicSubscriberSinge
+    public abstract class WalletTopicSubscriberSingle
     {
         private MessageType[] _filterList = new MessageType[0];
 
-        public WalletTopicSubscriberSinge(MyServiceBusTcpClient client, string topic, string queueName, TopicQueueType type)
+        public WalletTopicSubscriberSingle(MyServiceBusTcpClient client, string topic, string queueName, TopicQueueType type)
         {
             client.Subscribe(topic, queueName, type, ReadMessage);
         }
@@ -41,13 +41,13 @@ namespace WalletEngine.Messages.Tools
             switch (msg.MessageType)
             {
                 case MessageType.CashInOutRequest: return HandleCashInOutRequest((CashInOutRequestMessage)msg);
-                case MessageType.CashInOutConformation: return HandleCashInOutConformation((CashInOutConformationMessage)msg);
+                case MessageType.CashInOutConformation: return HandleCashInOutConfirmation((CashInOutConformationMessage)msg);
             }
 
             throw new Exception($"Cannot handle message type {msg.MessageType}");
         }
 
-        protected abstract ValueTask HandleCashInOutConformation(CashInOutConformationMessage message);
+        protected abstract ValueTask HandleCashInOutConfirmation(CashInOutConformationMessage message);
         
         protected abstract ValueTask HandleCashInOutRequest(CashInOutRequestMessage message);
     }

@@ -1,23 +1,21 @@
-﻿using System.Reflection.Metadata;
-using Autofac;
-using Autofac.Core;
-using Autofac.Core.Registration;
-using DotNetCoreDecorators;
-using MyJetWallet.Sdk.Service;
+﻿using Autofac;
 using MyJetWallet.Sdk.ServiceBus;
-using MyServiceBus.Abstractions;
 using Service.WalletEngine.Subscriber;
 using WalletEngine.Messages.Tools;
 
 namespace Service.WalletEngine.Modules
 {
-    public class ServiceModule: Module
+    public class ServiceModule : Module
     {
         protected override void Load(ContainerBuilder builder)
         {
+            var serviceBusClient = builder.RegisterMyServiceBusTcpClient(
+                Program.ReloadedSettings(e => e.ServiceBusHostPort),
+                Program.LogFactory);
+
             builder
-                .RegisterMyServiceBusTcpClient(Program.ReloadedSettings(e => e.ServiceBusHostPort), ApplicationEnvironment.HostName, Program.LogFactory)
-                .ThrowExceptionOnPublishIfNoConnection(true);
+                .RegisterMyServiceBusPublisher<byte[]>(serviceBusClient,
+                    $"{Program.Settings.TopicId}-output", true);
 
             builder
                 .RegisterType<EventPublisher>()
@@ -30,7 +28,6 @@ namespace Service.WalletEngine.Modules
                 .RegisterType<IncomingSubscriber>()
                 .SingleInstance()
                 .AutoActivate();
-
         }
     }
 }

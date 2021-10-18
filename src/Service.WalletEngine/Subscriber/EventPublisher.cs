@@ -1,6 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using MyServiceBus.TcpClient;
+using MyJetWallet.Sdk.ServiceBus;
 using WalletEngine.Messages;
 using WalletEngine.Messages.Tools;
 
@@ -8,17 +8,13 @@ namespace Service.WalletEngine.Subscriber
 {
     public class EventPublisher : IWalletTopicPublisher
     {
-        private readonly MyServiceBusTcpClient _client;
-        private readonly string _topic;
-        private readonly bool _immediatelyPersist;
+        private readonly IServiceBusPublisher<byte[]> _publisher;
 
         private ulong _lastSequenceId = 0;
 
-        public EventPublisher(MyServiceBusTcpClient client)
+        public EventPublisher(IServiceBusPublisher<byte[]> publisher)
         {
-            _topic = $"{Program.Settings.TopicId}-output";
-            _client = client.CreateTopicIfNotExists(_topic);
-            _immediatelyPersist = true;
+            _publisher = publisher;
         }
 
         public void SetLastSequenceId(ulong sequenceId)
@@ -26,14 +22,14 @@ namespace Service.WalletEngine.Subscriber
             _lastSequenceId = sequenceId;
         }
 
-        public Task Publish(IWalletMessage message)
+        public async Task Publish(IWalletMessage message)
         {
             var seqId = Interlocked.Increment(ref _lastSequenceId);
 
             message.SequenceId = seqId;
 
             var data = WalletMessageSerializer.Serialise(message);
-            return _client.PublishAsync(_topic, data, _immediatelyPersist);
+            await _publisher.PublishAsync(data);
         }
     }
 }
